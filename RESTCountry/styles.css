@@ -1,0 +1,80 @@
+body {
+  padding: 10px;
+  background-color: rgb(27, 2, 51);
+}
+
+img {
+  width: 50px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.country-container {
+  display: flex;
+  justify-content: center;
+  font-size: .9em;
+}
+button:disabled{
+  background-color: rgb(59, 59, 59);
+}
+.red{
+  background-color: red;
+}
+h1{
+  text-align: center;
+  color: seashell;
+}
+.add{
+border-radius: 5px;
+background: springgreen;
+}
+.remove{
+  border-radius: 5px;
+  background: tomato;
+}
+button:hover{
+  background-color: thistle;
+  animation-delay: 5s;
+}
+
+.country-list {
+  padding: 5px;
+  border: 3px solid grey;
+  margin-right: 10px;
+  width: 40%;
+  height:85vh ;
+  overflow-y: scroll;
+  background-color: seashell;
+}
+td{
+  vertical-align: top;
+}
+.Asia{
+  background-color: rgba(255, 0, 0, 0.452);
+  color: aliceblue;
+  font-weight: bold;
+}
+.Europe{
+  background-color: rgba(255, 217, 0, 0.411);
+  font-weight: bold;
+}
+.Africa{
+  background-color: rgba(205, 134, 63, 0.473);
+  font-weight: bold;
+}
+.Americas{
+  background-color: rgba(0, 128, 0, 0.445);
+  font-weight: bold;
+}
+.Polar{
+  background-color: rgba(224, 255, 255, 0.384);
+  font-weight: bold;
+}
+.Oceania{
+  background-color: rgba(0, 0, 255, 0.493);
+  font-weight: bold;
+}
+.All{
+  background-color: rgba(255, 92, 201, 0.623);
+  font-weight: bold;
+}
