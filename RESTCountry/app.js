@@ -1,162 +1,128 @@
-var url = 'https://restcountries.com/v2/all';                      //Url da API
-/*--------------------------------------------------------------Area de Declaração dos elementos Html-------------------------------------------------------------------------*/
-var ulPaises = document.querySelector('#tabCountries');
-var ulFav = document.querySelector('#tabFavorites')
-var popuTot = document.querySelector('#totalPopulationList')
-var totalP = document.querySelector('#countCountries')
-var totalPF = document.querySelector('#countFav')
-var popuTotF = document.querySelector('#totalPopulationFavorites')
-var Search = document.querySelector('#pesquisar')
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+const url = 'https://restcountries.com/v2/all?fields=name,nativeName,flag,region,population';
 
-/*--------------------------------------------------------------------------Declaração de Variaveis---------------------------------------------------------------------------*/
+const ulPaises = document.querySelector('#tabCountries');
+const ulFav = document.querySelector('#tabFavorites');
+const popuTot = document.querySelector('#totalPopulationList');
+const totalP = document.querySelector('#countCountries');
+const totalPF = document.querySelector('#countFav');
+const popuTotF = document.querySelector('#totalPopulationFavorites');
+const Search = document.querySelector('#pesquisar');
 
-var populationGlob = 0;
-var contP = 0;
-var favoritos = [];
-var country = [];
-var filtred = '';
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+let country = [];
+let favoritos = [];
+let filtred = '';
 
-country = [];
 fetch(url)
-    .then((response) => {
-        return response.json()
-    })
-    .then((result) => {
-        for (var i = 0; i < result.length; i++) {
-            country.push(result[i]);
-        }
-        popuTot.textContent = populationGlob;
-        renderizar();
-    })
+  .then((response) => response.json())
+  .then((result) => {
+    country = result;
+    renderizar();
+  });
 
-console.log(country);
+function renderizar(filter, type) {
+  let populationGlob = 0;
+  let contP = 0;
+  filtred = filter || '';
 
-
-
-function renderizar(filter, type) { // Recebe como parametro um valor para o filtro e um tipo de filtro
-    populationGlob = 0;
-    contP = 0;
-    filtred = '';
-    var paises = `
+  let paises = `
     <tr>
-        <th colspan='2'>Bandeira</th>
-        <th>Nome</th>
-        <th>População</th>
+      <th colspan='2'>Bandeira</th>
+      <th>Nome</th>
+      <th>População</th>
     </tr>`;
 
+  const filteredCountries = country.filter((countryItem) => {
+    if (!countryItem || favoritos.includes(countryItem)) return false;
 
-    if(type == 'Letter' ){ // Verifica se o filtro recebido foi um Nome ou letra
-
-        country.forEach((countryItem, index) => {
-            if (countryItem != '') {
-                if (countryItem.name.toLowerCase().startsWith(filter.toLowerCase()) || countryItem.nativeName.toLowerCase().startsWith(filter.toLowerCase())) {
-                    populationGlob += parseInt(countryItem.population);
-                    contP++;
-                    paises +=
-                        `<tr class='${countryItem.region}'>
-                    <td> <button class='add' onclick="favoritar(${index})"> + </button></td><td> <img src='${countryItem.flag}'>  </td>
-                    <td> ${countryItem.nativeName}(${countryItem.name})</td>
-                    <td> ${countryItem.population}</td>
-                </tr>`;
-                }
-    
-            }
-        });
-    }else if(type == 'Region'){ // Verifica se o filtro recebido foi uma região
-
-        filtred = filter
-        country.forEach((countryItem, index) => {
-            if (countryItem != '') {
-                if (countryItem.region == filter) {
-                    populationGlob += parseInt(countryItem.population);
-                    contP++;
-                    paises +=
-                        `<tr class='${countryItem.region}'>
-                    <td> <button class='add' onclick="favoritar(${index})"> + </button></td><td> <img src='${countryItem.flag}'>  </td>
-                    <td> ${countryItem.nativeName}(${countryItem.name})</td>
-                    <td> ${countryItem.population}</td>
-                </tr>`;
-                }
-    
-            }
-        });
-    }else {
-        country.forEach((countryItem, index) => { // Caso não exista filtro, renderiza tudo
-            if (countryItem != '') {
-                populationGlob += parseInt(countryItem.population);
-                contP++;
-                paises +=
-                    `<tr class='${countryItem.region}'>
-                    <td> <button class='add button' onclick="favoritar(${index})"> + </button></td><td> <img src='${countryItem.flag}'>  </td>
-                    <td> ${countryItem.nativeName}(${countryItem.name})</td>
-                    <td> ${countryItem.population}</td>
-                </tr>`;
-            }
-    
-        });
+    if (type === 'Letter') {
+      return (
+        countryItem.name.toLowerCase().startsWith(filter.toLowerCase()) ||
+        (countryItem.nativeName &&
+          countryItem.nativeName.toLowerCase().startsWith(filter.toLowerCase()))
+      );
     }
 
-    
-    ulPaises.innerHTML = paises;
-    popuTot.innerHTML = populationGlob;
-    totalP.innerHTML = contP;
+    if (type === 'Region') {
+      return countryItem.region === filter;
+    }
+
+    return true;
+  });
+
+  filteredCountries.forEach((countryItem) => {
+    const index = country.indexOf(countryItem);
+    populationGlob += parseInt(countryItem.population);
+    contP++;
+
+    paises += `
+      <tr class='${countryItem.region}'>
+        <td><button class='add button' onclick="favoritar(${index})"> + </button></td>
+        <td><img src='${countryItem.flag}' style="height: 20px;"></td>
+        <td>${countryItem.nativeName} (${countryItem.name})</td>
+        <td>${countryItem.population}</td>
+      </tr>`;
+  });
+
+  ulPaises.innerHTML = paises;
+  popuTot.textContent = populationGlob.toLocaleString('pt-BR');
+  totalP.textContent = contP;
 }
+
 function renderizarF() {
-    populationGlob = 0;
-    contP = 0;
-    var paises = `
+  let total = 0;
+  let cont = 0;
+
+  let favHTML = `
     <tr>
-        <th colspan='2'>Bandeira</th>
-        <th>Nome</th>
-        <th>População</th>
+      <th colspan='2'>Bandeira</th>
+      <th>Nome</th>
+      <th>População</th>
     </tr>`;
 
-    favoritos.forEach((FavItem, index) => {
-        if (FavItem != '') {
-            populationGlob += parseInt(FavItem.population);
-            contP++;
-            paises +=
-                `<tr class='${FavItem.region}'>
-            <td> <button class='remove' onclick="removeFav(${index})"> - </button></td><td> <img src='${FavItem.flag}'>  </td>
-            <td> ${FavItem.nativeName}(${FavItem.name})</td>
-            <td> ${FavItem.population}</td>
-        </tr>`;
-        }
+  favoritos.forEach((favItem, index) => {
+    total += parseInt(favItem.population);
+    cont++;
 
-    });
-    ulFav.innerHTML = paises;
-    totalPF.innerHTML = contP;
-    popuTotF.innerHTML = populationGlob;
+    favHTML += `
+      <tr class='${favItem.region}'>
+        <td><button class='remove' onclick="removeFav(${index})"> - </button></td>
+        <td><img src='${favItem.flag}' style="height: 20px;"></td>
+        <td>${favItem.nativeName} (${favItem.name})</td>
+        <td>${favItem.population}</td>
+      </tr>`;
+  });
+
+  ulFav.innerHTML = favHTML;
+  popuTotF.textContent = total.toLocaleString('pt-BR');
+  totalPF.textContent = cont;
 }
-function favoritar(indice) {
-    Search.value = '';
-    favoritos[indice] = country[indice];
-    country[indice] = '';
-    Search.value = '';
-    if (filtred != '') {
-        renderizar(filtred, 'Region');
-    } else {
-        renderizar();
-    }
-    renderizarF();
+
+function favoritar(index) {
+  const pais = country[index];
+  if (!favoritos.includes(pais)) {
+    favoritos.push(pais);
+  }
+
+  country = country.filter((_, i) => i !== index);
+
+  renderizar(filtred, filtred ? 'Region' : undefined);
+  renderizarF();
 }
-function removeFav(indice) {
-    Search.value = '';
-    country[indice] = favoritos[indice];
-    favoritos[indice] = '';
 
-    if (filtred != '') {
-        renderizar(filtred, 'Region');
-    } else {
-        renderizar();
-    }
-    renderizarF();
+function removeFav(index) {
+  const pais = favoritos[index];
+  country.push(pais);
+  favoritos = favoritos.filter((_, i) => i !== index);
 
+  renderizar(filtred, filtred ? 'Region' : undefined);
+  renderizarF();
 }
 
 Search.addEventListener('input', () => {
-    renderizar(Search.value, 'Letter')
-})
-
+  const termo = Search.value.trim();
+  if (termo.length > 0) {
+    renderizar(termo, 'Letter');
+  } else {
+    renderizar(filtred, filtred ? 'Region' : undefined);
+  }
+});
