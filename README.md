@@ -4,8 +4,6 @@ Projeto simples de consumindo uma api de informações dos países.
 
 ---
 
----
-
 ## Tecnologias Utilizadas
 
 - HTML
